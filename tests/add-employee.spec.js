@@ -1,6 +1,6 @@
 const {test,expect} = require('@playwright/test');
 
-test('Add employee', async({page})=>{
+test('Add, Search and Delete an employee record', async({page})=>{
     await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login');
     await page.getByPlaceholder('Username').fill('Admin');
     await page.getByPlaceholder('Password').fill('admin123');
@@ -36,6 +36,10 @@ test('Add employee', async({page})=>{
     await expect(nameField).toHaveValue(new RegExp(firstName));
 
     await page.getByRole('button',{name:'Search'}).click();
+    const row = await page.getByRole('row').filter({hasText:firstName});
+    await expect(row).toHaveCount(1);
 
-    await expect(nameField).toHaveValue(new RegExp(firstName));
+    await row.locator(".bi-trash").click();
+    await page.getByRole('button',{name:'Yes, Delete'}).click();
+    await expect(row).toHaveCount(0);
 });
